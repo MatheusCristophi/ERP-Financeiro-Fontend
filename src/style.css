@@ -1,0 +1,23 @@
+:root {
+    --primary-background-color: #f6fffe;
+    --secundary-background-color: #ffffff;
+    --third-background-color: #d6d6d6;
+    --shadow-background-color: #d6d6d6;
+    --option-color: #000000;
+    --p-text-color: #c5dcff;
+    --h1-text-color: #70a1eb;
+}
+
+*, *::before, *::after {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    min-height: 100vh;
+    overflow-x: hidden;
+    overflow-y: hidden;
+    font-family: 'Lucida Sans Unicode';
+    background-color: var(--primary-background-color);
+}
