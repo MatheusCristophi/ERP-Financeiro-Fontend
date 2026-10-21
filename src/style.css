@@ -1,11 +1,9 @@
 :root {
-    --primary-background-color: #f6fffe;
-    --secundary-background-color: #ffffff;
+    --primary-background-color: #fff;
+    --secondary-background-color: #f9f9f9;
     --third-background-color: #d6d6d6;
-    --shadow-background-color: #d6d6d6;
+    --button-color: #dddddd;
     --option-color: #000000;
-    --p-text-color: #c5dcff;
-    --h1-text-color: #70a1eb;
 }
 
 *, *::before, *::after {
@@ -15,6 +13,7 @@
 }
 
 body {
+    scroll-behavior: smooth;
     min-height: 100vh;
     overflow-x: hidden;
     overflow-y: hidden;

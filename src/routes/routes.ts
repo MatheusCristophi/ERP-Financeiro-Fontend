@@ -8,6 +8,6 @@ export const routes: RouteRecordRaw[] = [
     },
     {
         path: '/login',
-        component: LoginPage
+        component: LoginPage,    
     }
 ]

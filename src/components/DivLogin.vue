@@ -5,85 +5,122 @@ import { login } from '../api/Api';
 import type { AuthType } from '../types/AuthType';
 
 defineProps<{
-    firstInputType: string;
-    secondInputType: string;
-    thridInputType: string;
-    text: string;
+  firstInputType: string;
+  secondInputType: string;
+  thridInputType: string;
+  text: string;
 }>();
 
 const formData = reactive<AuthType>({
-    cnpj: '',
-    email: '',
-    senha: ''
+  cnpj: '',
+  email: '',
+  senha: ''
 });
+
+const formatarCnpj = (e: Event) => {
+  const input = e.target as HTMLInputElement;
+  let valor = input.value;
+
+  valor = valor.replace(/\D/g, ''); 
+
+  if (valor.length > 2)  valor = valor.replace(/^(\d{2})(\d)/, '$1.$2');
+  if (valor.length > 5)  valor = valor.replace(/^(\d{2})\.(\d{3})(\d)/, '$1.$2.$3');
+  if (valor.length > 8)  valor = valor.replace(/^(\d{2})\.(\d{3})\.(\d{3})(\d)/, '$1.$2.$3/$4');
+  if (valor.length > 12) valor = valor.replace(/^(\d{2})\.(\d{3})\.(\d{3})\/(\d{4})(\d)/, '$1.$2.$3/$4-$5');
+  
+  formData.cnpj = valor;
+};
 
 const options = ref(["Dono", "Administrador Do Sistema", "Analista de Contas a Pagar", "Analista de Contas a Receber", "Consultor"])
 
 const optionSelected = ref("Consultor");
 
 const handleLogin = async () => {
-    login(formData)
+  const tempFormData = {
+    ...formData,
+    cnpj: formData.cnpj.replace(/\D/g, ''),
+  }
+  login(tempFormData)
 }
 
 </script>
 
 <template>
-    <form class="loginForm" @submit.prevent="handleLogin">
-        <h1>Entre na sua Conta</h1>
-        <select class="loginInputs" id="selectOptions" v-model="optionSelected">
-            <option v-for="option in options" :key="option" :value="option">
-                {{ option }}
-            </option>
-        </select>
-        <input class="loginInputs" :type="firstInputType" v-model="formData.cnpj" placeholder="Digite o cnpj da Empresa: " required>
-        <input class="loginInputs" :type="secondInputType" v-model="formData.email" placeholder="Digite seu Email: " required>
-        <input class="loginInputs" :type="thridInputType" v-model="formData.senha" placeholder="Digite sua Senha: " required>
-        <button class="buttonLogin">{{ text }}</button>
-    </form>
+  <form class="loginForm" @submit.prevent="handleLogin">
+    <div class="loginDiv">
+      <h1>Entre na sua Conta</h1>
+      <select id="selectOptions" v-model="optionSelected">
+        <option v-for="option in options" :key="option" :value="option">
+          {{ option }}
+        </option>
+      </select>
+      <input class="loginInputs" :type="firstInputType" :value="formData.cnpj" @input="formatarCnpj" pattern="\d{2}\.\d{3}\.\d{3}/\d{4}-\d{2}"
+        placeholder="Digite o cnpj da Empresa: " maxlength="18" autocomplete="off"
+        required>
+      <input class="loginInputs" :type="secondInputType" v-model="formData.email" placeholder="Digite seu Email: "
+        required>
+      <input class="loginInputs" :type="thridInputType" v-model="formData.senha" placeholder="Digite sua Senha: "
+        required>
+      <button class="buttonLogin">{{ text }}</button>
+    </div>
+  </form>
 </template>
 
 <style scoped>
-    .loginForm {
-        background-color: var(--secundary-background-color);
-        height: 70vh;
-        margin-top: 15vh;
-        border: 1px solid black;
-        width: 50vw;
-        justify-self: center;
-        align-self: center;
-        display: flex;
-        gap: 50px;
-        flex-direction: column;
-        
-        h1 {
-            text-align: center;
-            padding-top: 30px;
-        }
+.loginForm {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 100vh;
+}
 
-        .loginInputs {
-            width: 80%;
-            height: 60px;
-            align-self: center;
-            color: var(--option-color);
-            background-color: var(--shadow-background-color);
-            padding-left: 30px;
-            border: 1px solid black;
-            font-size: larger;
-        }
-    }
-        
-    .buttonLogin {
-        width: 30%;
-        height: 40px;
-        border: 1px solid black;
-        align-self: center;
-        background-color: var(--third-background-color);
-        color: var(--option-color);
-        border-radius: 10px;
-    }
+.loginDiv {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  width: 40vw;
+  height: 60vh;
+  background-color: var(--secondary-background-color);
+  border-radius: 10px;
+  box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+}
 
-    .buttonLogin:hover {
-        background-color: var(--shadow-background-color);
-        cursor: pointer;
-    }
+select {
+  width: 80%;
+  height: 40px;
+  margin-top: 60px;
+  margin-bottom: 20px;
+  border-radius: 5px;
+  border: none;
+  padding: 0 10px;
+}
+
+.loginInputs {
+  width: 80%;
+  height: 40px;
+  margin-bottom: 20px;
+  border-radius: 5px;
+  border: none;
+  padding: 0 10px;
+}
+
+.buttonLogin {
+  width: 80%;
+  height: 40px;
+  border-radius: 5px;
+  border: none;
+  background-color: var(--button-color);
+  color: var(--option-color);
+  font-size: 16px;
+  cursor: pointer;
+}
+
+.buttonLogin:hover {
+  background-color: var(--option-color);
+  color: var(--button-color);
+}
+
 </style>
