@@ -1,8 +1,9 @@
 <script lang="ts" setup>
 
-import { reactive, ref } from 'vue'
+import { reactive } from 'vue'
 import { login } from '../api/Api';
 import type { AuthType } from '../types/AuthType';
+import router from '../routes';
 
 defineProps<{
   firstInputType: string;
@@ -31,16 +32,10 @@ const formatarCnpj = (e: Event) => {
   formData.cnpj = valor;
 };
 
-const options = ref(["Dono", "Administrador Do Sistema", "Analista de Contas a Pagar", "Analista de Contas a Receber", "Consultor"])
-
-const optionSelected = ref("Consultor");
-
 const handleLogin = async () => {
-  const tempFormData = {
-    ...formData,
-    cnpj: formData.cnpj.replace(/\D/g, ''),
-  }
-  login(tempFormData)
+  formData.cnpj = formData.cnpj.replace(/\D/g, '');
+  await login(formData);
+  router.push('/main')
 }
 
 </script>
@@ -49,11 +44,6 @@ const handleLogin = async () => {
   <form class="loginForm" @submit.prevent="handleLogin">
     <div class="loginDiv">
       <h1>Entre na sua Conta</h1>
-      <select id="selectOptions" v-model="optionSelected">
-        <option v-for="option in options" :key="option" :value="option">
-          {{ option }}
-        </option>
-      </select>
       <input class="loginInputs" :type="firstInputType" :value="formData.cnpj" @input="formatarCnpj" pattern="\d{2}\.\d{3}\.\d{3}/\d{4}-\d{2}"
         placeholder="Digite o cnpj da Empresa: " maxlength="18" autocomplete="off"
         required>
@@ -86,16 +76,10 @@ const handleLogin = async () => {
   background-color: var(--secondary-background-color);
   border-radius: 10px;
   box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
-}
 
-select {
-  width: 80%;
-  height: 40px;
-  margin-top: 60px;
-  margin-bottom: 20px;
-  border-radius: 5px;
-  border: none;
-  padding: 0 10px;
+  h1 {
+    margin-bottom: 30px;
+  }
 }
 
 .loginInputs {

@@ -1,15 +1,10 @@
 <script lang="ts" setup>
-
-defineProps <{
-    text: string
-}>();
-
 </script>
 
 <template>
     <div class="headerDiv">
         <h1 class="headerH1">ERP FINANCE</h1>
-        <p class="headerP">{{ text }}</p>
+        <p class="headerP">Bem vindo ao sistema ERP</p>
     </div>
 </template>
 
@@ -20,22 +15,28 @@ defineProps <{
         align-items: center;
         width: 100%;
         min-height: 70px;
-        background-color: var(--primary-background-color);
+        background-color: var(--secondary-background-color);
+        border-bottom: 2px solid var(--third-background-color);
         margin: 0;
-        padding: 0;
+        padding: 0 24px;
+        gap: 16px;
+        box-sizing: border-box;
     }
 
     .headerH1 {
-        margin-left: 70px;
+        margin-left: 0;
         color: var(--h1-text-color);
         font-size: 20px;
+        white-space: nowrap;
     }
 
     .headerP {
-        height: 30px;
-        margin-right: 70px;
+        height: auto;
+        margin-right: 0;
         color: var(--p-text-color);
         align-content: center;
         font-size: larger;
+        text-align: right;
+        white-space: nowrap;
     }
 </style>
