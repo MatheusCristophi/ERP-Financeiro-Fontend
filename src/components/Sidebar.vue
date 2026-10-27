@@ -1,11 +1,31 @@
 <script lang="ts" setup>
+
+import { ref } from 'vue'
+
 const menuItems = [
+  'Dashboard',
   'Empresa',
   'Conta',
-  'Lançamento',
+  'Lancamento',
   'Pessoa',
   'Categoria',
+  'Configuracao'
 ];
+
+const emit = defineEmits<{
+  (e: 'telaTrocada', novaTela: string):void
+}>()
+
+const botaoEscolhido = ref('Dashboard');
+
+function selecionarBotao(selecao:string) {
+  botaoEscolhido.value = selecao
+
+  emit('telaTrocada', selecao)
+}
+
+console.log(botaoEscolhido)
+
 </script>
 
 <template>
@@ -13,18 +33,12 @@ const menuItems = [
     <nav class="sidebar-nav">
       <ul>
         <li v-for="item in menuItems" :key="item" class="nav-item">
-          <button type="button" class="nav-button">
+          <button type="button" class="nav-button" @click="selecionarBotao(item)">
             {{ item }}
           </button>
         </li>
       </ul>
     </nav>
-
-    <div class="sidebar-footer">
-      <button type="button" class="nav-button settings-button">
-        Configurações
-      </button>
-    </div>
   </aside>
 </template>
 
@@ -46,10 +60,6 @@ const menuItems = [
   display: flex;
   flex-direction: column;
   gap: 50px;
-}
-
-.nav-item {
-  width: 100%;
 }
 
 .settings-button{

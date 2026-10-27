@@ -1,31 +1,40 @@
 <script lang="ts" setup>
-import { computed } from 'vue';
-
+import { computed, ref } from 'vue';
 
 const role = computed<string>(
     () => localStorage.getItem('role') || ''
 );
 
-const saldoMensal = computed<number>(
-    () => (0)
-);
 
-const saldoAnual = computed<number>(
-    () => (0)
-);
 
 </script>
 
 <template>
     <div v-if="role === 'DONO'" class="dashboardDono">
-        <div class="saldo">
-            <h1>Despesas e Receitas Mensais</h1>
-            <h1>{{ saldoMensal }}</h1>
+        <div class="despRect">
+            <h1>Despesas e Receitas</h1>
+            <svg class="despRectGrafico"></svg>
         </div>
-        <div class="saldo">
-            <h1>Despesas e Receitas Anuais</h1>
-            <h1>{{ saldoAnual }}</h1>
-        </div>      
+        <div class="produto">
+            <h1>Produtos Mais Vendidos</h1>
+            <svg class="produtoGrafico"></svg>
+        </div>
+        <div>
+        </div>
+        <div>
+        </div>
+    </div>
+
+    <div v-else-if="role === 'ADMINISTRADOR_DO_SISTEMA'" class="dashboardDono">
+
+    </div>
+
+    <div v-else-if="role === 'CONSULTOR'" class="dashboardDono">
+
+    </div>
+
+    <div v-else-if="role === 'CONSULTOR'" class="dashboardDono">
+
     </div>
 
     <div v-else class="dashboardInvalido">
@@ -45,17 +54,22 @@ const saldoAnual = computed<number>(
     height: 95vh;
     gap: 20px;
 
-    .saldo {
+    .despRect, .produto {
         justify-self: center;
         align-content: center;
         border: 2px solid var(--third-background-color);
         border-radius: 20px;
-        height: 200px;
+        height: 350px;
         color: var(--ph-color);
         font-size: small;
         text-align: center;
         flex: 1 1 calc(50% - 16px);
     }
+}
+
+.despRectGrafico, .produtoGrafico {
+    width: 90%;
+    height: 70%;
 }
 
 .dashboardInvalido {

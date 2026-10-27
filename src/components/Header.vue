@@ -1,10 +1,11 @@
 <script lang="ts" setup>
+const nome = localStorage.getItem('nome')
 </script>
 
 <template>
     <div class="headerDiv">
         <h1 class="headerH1">ERP FINANCE</h1>
-        <p class="headerP">Bem vindo ao sistema ERP</p>
+        <p class="headerP">Bem vindo ao sistema, {{ nome }}</p>
     </div>
 </template>
 

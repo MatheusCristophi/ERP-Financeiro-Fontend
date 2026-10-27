@@ -1,14 +1,86 @@
 <script lang="ts" setup>
 import Header from '../components/Header.vue';
 import Sidebar from '../components/Sidebar.vue';
+import EmpresaDiv from '../components/EmpresaDiv.vue';
 import DashboardDiv from '../components/DashboardDiv.vue';
+import { ref } from 'vue'
+
+const telaAtual = ref('Dashboard');
+
+function atualizarTela(novaTela:string) {
+    telaAtual.value = novaTela
+}
+
 </script>
 
 <template>
-    <div class="app-layout">
+    <div class="app-layout" v-if="telaAtual === 'Dashboard'">
+        <Sidebar @tela-trocada="atualizarTela" class="app-sidebar" />
+        <div class="main-container">
+            <Header class="app-header" />
+            <main>
+                <DashboardDiv />
+            </main>
+        </div>
 
-        <Sidebar class="app-sidebar" />
+    </div>
+    <div class="app-layout" v-if="telaAtual === 'Empresa'">
+        <Sidebar @tela-trocada="atualizarTela" class="app-sidebar" />
+        <div class="main-container">
+            <Header class="app-header" />
 
+            <main>
+                <EmpresaDiv />
+            </main>
+        </div>
+
+    </div>
+    <div class="app-layout" v-if="telaAtual === 'Conta'">
+        <Sidebar @tela-trocada="atualizarTela" class="app-sidebar" />
+        <div class="main-container">
+            <Header class="app-header" />
+
+            <main>
+                <DashboardDiv />
+            </main>
+        </div>
+
+    </div>
+    <div class="app-layout" v-if="telaAtual === 'Lancamento'">
+        <Sidebar @tela-trocada="atualizarTela" class="app-sidebar" />
+        <div class="main-container">
+            <Header class="app-header" />
+
+            <main>
+                <DashboardDiv />
+            </main>
+        </div>
+
+    </div>
+    <div class="app-layout" v-if="telaAtual === 'Pessoa'">
+        <Sidebar @tela-trocada="atualizarTela" class="app-sidebar" />
+        <div class="main-container">
+            <Header class="app-header" />
+
+            <main>
+                <DashboardDiv />
+            </main>
+        </div>
+
+    </div>
+    <div class="app-layout" v-if="telaAtual === 'Categoria'">
+        <Sidebar @tela-trocada="atualizarTela" class="app-sidebar" />
+        <div class="main-container">
+            <Header class="app-header" />
+
+            <main>
+                <DashboardDiv />
+            </main>
+        </div>
+
+    </div>
+    <div class="app-layout" v-if="telaAtual === 'Configuracao'">
+        <Sidebar @tela-trocada="atualizarTela" class="app-sidebar" />
         <div class="main-container">
             <Header class="app-header" />
 

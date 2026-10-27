@@ -2,6 +2,8 @@ import type { AuthType } from "../types/AuthType";
 
 const baseUrl = import.meta.env.VITE_API_URL;
 
+// Autenticação do usuário
+
 export async function login(authBody: AuthType) {
 
     const response = await fetch(baseUrl + 'auth', {
@@ -23,12 +25,21 @@ export async function login(authBody: AuthType) {
 export async function buscarSessao() {
     const response = await fetch(baseUrl + 'auth/me', {
         method: 'GET',
-        credentials: 'include'
+        credentials: 'include',
+        headers: { 'Content-Type': 'application/json' }
     })
 
     if (!response.ok) {
         throw new Error('Erro ao buscar sessão')
     }
+
+    const data = await response.json();
+
+    localStorage.setItem('nome' , data.nome)
+    localStorage.setItem('role' , data.role)
+    localStorage.setItem('empresaId', data.empresaId)
+
+    return data;
 }
 
 export async function logout() {
@@ -40,6 +51,9 @@ export async function logout() {
     if (!response.ok) {
         throw new Error('Erro ao fazer logout')
     }
+
+    localStorage.clear();
+    sessionStorage.clear();
 
     window.location.href = '/login'
 }
