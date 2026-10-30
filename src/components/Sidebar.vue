@@ -1,6 +1,7 @@
 <script lang="ts" setup>
 
 import { ref } from 'vue'
+import { logout } from '../api/Api';
 
 const menuItems = [
   'Dashboard',
@@ -37,6 +38,9 @@ console.log(botaoEscolhido)
             {{ item }}
           </button>
         </li>
+        <button type="button" class="btn-logout" @click="logout">
+            Sair
+        </button>
       </ul>
     </nav>
   </aside>
@@ -53,6 +57,22 @@ console.log(botaoEscolhido)
 
 .sidebar-nav {
   width: 100%;
+}
+
+.btn-logout {
+  position: absolute;
+  align-self: center;
+  background-color: var(--secondary-background-color);
+  border-radius: 10px;
+  border: 2px solid var(--third-background-color);
+  bottom: 20px;
+  width: 100px;
+  height: 40px;
+}
+
+.btn-logout:hover {
+  cursor: pointer;
+  background-color: var(--third-background-color);
 }
 
 .sidebar-nav ul {

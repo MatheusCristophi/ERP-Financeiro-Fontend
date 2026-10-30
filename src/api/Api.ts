@@ -1,4 +1,5 @@
 import type { AuthType } from "../types/AuthType";
+import type { EnterpriseType } from "../types/EnterpriseType";
 
 const baseUrl = import.meta.env.VITE_API_URL;
 
@@ -43,7 +44,7 @@ export async function buscarSessao() {
 }
 
 export async function logout() {
-    const response = await fetch('' + baseUrl + 'auth/logout', {
+    const response = await fetch(baseUrl + 'auth/logout', {
         method: 'POST',
         credentials: 'include'    
     })
@@ -56,4 +57,42 @@ export async function logout() {
     sessionStorage.clear();
 
     window.location.href = '/login'
+}
+
+// Chamadas da Empresa
+
+export async function criarEmpresa(empresaBody:any) {
+    const empresaId = localStorage.getItem('empresaId')
+
+    const response = await fetch(baseUrl + 'empresas', {
+        method: 'POST',
+        credentials: 'include',
+        headers: { 'Content-Type': 'application/json'},
+        body: JSON.stringify({
+            descricao: empresaBody.descricao,
+            cnpj: empresaBody.cnpj,
+            empresaTiposAtividade: empresaBody.empresaTiposAtividade,
+            empresaRegimeTributario: empresaBody.empresaRegimeTributario,
+            empresaNaturezaPessoa: empresaBody.empresaNaturezaPessoa
+        })
+    })
+}
+
+export async function buscarEmpresaAtual() {
+    const empresaId = localStorage.getItem('empresaId')
+
+    const response = await fetch(baseUrl + 'empresas/' + empresaId, {
+        method: 'GET',
+        credentials: 'include',
+        headers: { 'Content-Type': 'application/json' },
+        
+    })
+
+    if(!response.ok) {
+        throw new Error("Erro ao buscar a empresa");
+    }
+
+    const data = await response.json()
+
+    return data
 }

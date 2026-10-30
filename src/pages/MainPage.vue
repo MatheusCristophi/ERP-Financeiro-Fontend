@@ -3,7 +3,7 @@ import Header from '../components/Header.vue';
 import Sidebar from '../components/Sidebar.vue';
 import EmpresaDiv from '../components/EmpresaDiv.vue';
 import DashboardDiv from '../components/DashboardDiv.vue';
-import { ref } from 'vue'
+import { ref } from 'vue';
 
 const telaAtual = ref('Dashboard');
 
@@ -28,7 +28,6 @@ function atualizarTela(novaTela:string) {
         <Sidebar @tela-trocada="atualizarTela" class="app-sidebar" />
         <div class="main-container">
             <Header class="app-header" />
-
             <main>
                 <EmpresaDiv />
             </main>
