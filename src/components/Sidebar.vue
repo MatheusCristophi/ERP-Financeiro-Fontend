@@ -9,8 +9,7 @@ const menuItems = [
   'Conta',
   'Lancamento',
   'Pessoa',
-  'Categoria',
-  'Configuracao'
+  'Categoria'
 ];
 
 const emit = defineEmits<{

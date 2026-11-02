@@ -1,6 +1,6 @@
 <script lang="ts" setup>
 import { computed, onMounted, ref, toRaw } from 'vue';
-import { buscarEmpresaAtual, criarEmpresa } from '../api/Api';
+import { buscarEmpresaAtual, criarEmpresa, atualizarEmpresa } from '../api/Api';
 import type { EnterpriseType } from '../types/EnterpriseType';
 
 const role = localStorage.getItem('role')
@@ -8,10 +8,13 @@ const role = localStorage.getItem('role')
 const empresa = ref<EnterpriseType | null>(null)
 
 const carregando = ref(true)
+const atualizando = ref(false)
 
 const erro = ref<string | null>(null)
+const mensagemSucesso = ref<string | null>(null)
 
 const mostrarFormulario = ref(false);
+const modoEdicao = ref(false);
 
 const optionsRegime = [
     { text: 'Mei', value: 'MEI' },
@@ -59,22 +62,28 @@ const formatarCnpj = (e: Event) => {
   empresaForm.value.cnpj = valor;
 };
 
-onMounted(async () => {
+const carregarDadosEmpresa = async () => {
     try {
+        carregando.value = true;
+        erro.value = null;
         const data = await buscarEmpresaAtual();
 
         empresa.value = {
-            descricao: data.descricao ?? "Não foi possível buscar os dados",
-            empresaTiposAtividade: data.empresaTiposAtividade ?? 'Não informado',
-            empresaRegimeTributario: data.empresaRegimeTributario ?? 'Não informado',
-            empresaNaturezaPessoa: data.empresaNaturezaPessoa ?? 'Não informado',
-            status: data.status ?? 'Não informado'
+            descricao: data?.descricao ?? "Não foi possível buscar os dados",
+            empresaTiposAtividade: data?.empresaTiposAtividade ?? 'Não informado',
+            empresaRegimeTributario: data?.empresaRegimeTributario ?? 'Não informado',
+            empresaNaturezaPessoa: data?.empresaNaturezaPessoa ?? 'Não informado',
+            status: data?.status ?? 'Não informado'
         };
     } catch (e) {
-        erro.value = "Não foi possível carregar os dados da empresa.;"
+        erro.value = "Não foi possível carregar os dados da empresa.";
     } finally {
-        carregando.value = false
+        carregando.value = false;
     }
+}
+
+onMounted(() => {
+    carregarDadosEmpresa();
 })
 
 const campos = computed(() => [
@@ -85,12 +94,37 @@ const campos = computed(() => [
     { label: 'Status', valor: empresa.value?.status ?? '—' }
 ]);
 
-function alternarFormulario() {
+function alternarFormularioCadastro() {
+    modoEdicao.value = false;
     mostrarFormulario.value = !mostrarFormulario.value;
+    if (mostrarFormulario.value) {
+        empresaForm.value = {
+            descricao: '',
+            cnpj: '',
+            empresaTiposAtividade: 'INDUSTRIAL',
+            empresaRegimeTributario: 'MEI',
+            empresaNaturezaPessoa: 'EMPRESARIO_INDIVIDUAL',
+            status: 'true'
+        };
+    }
+}
+
+function alternarFormularioEdicao() {
+    modoEdicao.value = true;
+    mostrarFormulario.value = true;
+    if (empresa.value) {
+        empresaForm.value = {
+            descricao: empresa.value.descricao || '',
+            cnpj: '',
+            empresaTiposAtividade: empresa.value.empresaTiposAtividade || 'INDUSTRIAL',
+            empresaRegimeTributario: empresa.value.empresaRegimeTributario || 'MEI',
+            empresaNaturezaPessoa: empresa.value.empresaNaturezaPessoa || 'EMPRESARIO_INDIVIDUAL',
+            status: empresa.value.status || 'true'
+        };
+    }
 }
 
 const salvarEmpresa = async () => {
-
     const cnpjLimpo = empresaForm.value.cnpj.replace(/\D/g, '');
 
     const payload = {
@@ -99,8 +133,34 @@ const salvarEmpresa = async () => {
     }
 
     await criarEmpresa(payload);
-
     mostrarFormulario.value = false;
+    await carregarDadosEmpresa();
+}
+
+const executarAtualizacaoEmpresa = async () => {
+    try {
+        atualizando.value = true;
+        erro.value = null;
+        const cnpjLimpo = empresaForm.value.cnpj ? empresaForm.value.cnpj.replace(/\D/g, '') : '';
+        const payload = {
+            ...toRaw(empresaForm.value),
+            cnpj: cnpjLimpo
+        };
+
+        // Chama a função da API vazia para o usuário completar
+        await atualizarEmpresa(payload);
+
+        mensagemSucesso.value = 'Empresa atualizada com sucesso!';
+        mostrarFormulario.value = false;
+        await carregarDadosEmpresa();
+        setTimeout(() => {
+            mensagemSucesso.value = null;
+        }, 3000);
+    } catch (e: any) {
+        erro.value = e?.message ?? 'Erro ao atualizar dados da empresa.';
+    } finally {
+        atualizando.value = false;
+    }
 }
 
 </script>
@@ -113,6 +173,7 @@ const salvarEmpresa = async () => {
 
         <div v-else-if="erro" class="estado erro">
             <p>{{ erro }}</p>
+            <button type="button" class="btn-secundario" @click="carregarDadosEmpresa">Tentar novamente</button>
         </div>
 
         <div v-else class="conteudo">
@@ -121,6 +182,10 @@ const salvarEmpresa = async () => {
                     <span class="eyebrow">Dados da empresa</span>
                     <h2>Perfil institucional</h2>
                 </div>
+
+                <button type="button" class="btn-atualizar" @click="carregarDadosEmpresa" :disabled="carregando">
+                    Atualizar dados
+                </button>
             </div>
 
             <p class="descricao">{{ empresa?.descricao }}</p>
@@ -141,6 +206,7 @@ const salvarEmpresa = async () => {
 
         <div v-else-if="erro" class="estado erro">
             <p>{{ erro }}</p>
+            <button type="button" class="btn-secundario" @click="carregarDadosEmpresa">Tentar novamente</button>
         </div>
 
         <div v-else class="conteudo dono-content">
@@ -150,14 +216,23 @@ const salvarEmpresa = async () => {
                     <h2>Perfil institucional</h2>
                 </div>
 
-                <button type="button" class="btn-adicionar" @click="alternarFormulario">
-                    {{ mostrarFormulario ? 'Cancelar' : 'Adicionar empresa' }}
-                </button>
+                <div class="acoes-header">
+                    <button type="button" class="btn-atualizar" @click="carregarDadosEmpresa" title="Recarregar dados">
+                        Atualizar dados
+                    </button>
+                    <button type="button" class="btn-secundario" @click="alternarFormularioEdicao">
+                        Editar empresa
+                    </button>
+                    <button type="button" class="btn-adicionar" @click="alternarFormularioCadastro">
+                        {{ mostrarFormulario && !modoEdicao ? 'Cancelar' : 'Nova empresa' }}
+                    </button>
+                </div>
             </div>
 
+            <p v-if="mensagemSucesso" class="mensagem-sucesso">{{ mensagemSucesso }}</p>
             <p class="descricao">{{ empresa?.descricao }}</p>
 
-            <div v-show="mostrarFormulario === false" class="grid">
+            <div v-show="!mostrarFormulario" class="grid">
                 <div v-for="campo in campos" :key="campo.label" class="info-card">
                     <span>{{ campo.label }}</span>
                     <strong>{{ campo.valor }}</strong>
@@ -166,7 +241,7 @@ const salvarEmpresa = async () => {
 
             <div v-if="mostrarFormulario" class="formulario">
                 <div class="form-header">
-                    <h3>Cadastrar nova empresa</h3>
+                    <h3>{{ modoEdicao ? 'Atualizar empresa atual' : 'Cadastrar nova empresa' }}</h3>
                 </div>
 
                 <div class="form-grid">
@@ -212,9 +287,12 @@ const salvarEmpresa = async () => {
 
                 <div class="form-actions">
                     <button type="button" class="btn-secundario" @click="mostrarFormulario = false">
-                        Fechar
+                        Cancelar
                     </button>
-                    <button type="button" class="btn-primary" @click="salvarEmpresa">
+                    <button v-if="modoEdicao" type="button" class="btn-primary" @click="executarAtualizacaoEmpresa" :disabled="atualizando">
+                        {{ atualizando ? 'Atualizando...' : 'Atualizar empresa' }}
+                    </button>
+                    <button v-else type="button" class="btn-primary" @click="salvarEmpresa">
                         Salvar empresa
                     </button>
                 </div>
@@ -255,6 +333,13 @@ const salvarEmpresa = async () => {
     align-items: center;
     justify-content: space-between;
     gap: 16px;
+    flex-wrap: wrap;
+}
+
+.acoes-header {
+    display: flex;
+    align-items: center;
+    gap: 10px;
 }
 
 .eyebrow {
@@ -277,6 +362,15 @@ h2 {
     font-size: 1rem;
     line-height: 1.6;
     max-width: 800px;
+}
+
+.mensagem-sucesso {
+    color: #1b7340;
+    background: #eaf8ef;
+    padding: 10px 16px;
+    border-radius: 10px;
+    font-size: 0.9rem;
+    font-weight: 600;
 }
 
 .grid {
@@ -309,6 +403,7 @@ h2 {
     line-height: 1.4;
 }
 
+.btn-atualizar,
 .btn-adicionar,
 .btn-primary,
 .btn-secundario {
@@ -317,7 +412,13 @@ h2 {
     padding: 12px 18px;
     font-weight: 600;
     cursor: pointer;
-    transition: opacity 0.2s ease;
+    transition: opacity 0.2s ease, transform 0.1s ease;
+}
+
+.btn-atualizar {
+    background: var(--secondary-background-color);
+    border: 1px solid var(--third-background-color);
+    color: var(--option-color);
 }
 
 .btn-adicionar,
@@ -332,10 +433,12 @@ h2 {
     color: var(--option-color);
 }
 
+.btn-atualizar:hover,
 .btn-adicionar:hover,
 .btn-primary:hover,
 .btn-secundario:hover {
     opacity: 0.92;
+    transform: translateY(-1px);
 }
 
 .formulario {
@@ -368,7 +471,7 @@ label {
     font-size: 0.9rem;
 }
 
-input {
+input, select {
     width: 100%;
     border: 1px solid var(--third-background-color);
     background: var(--primary-background-color);
@@ -378,7 +481,7 @@ input {
     font: inherit;
 }
 
-input:focus {
+input:focus, select:focus {
     outline: 2px solid rgba(0, 0, 0, 0.08);
 }
 
@@ -390,6 +493,8 @@ input:focus {
 
 .estado {
     display: flex;
+    flex-direction: column;
+    gap: 12px;
     align-items: center;
     justify-content: center;
     min-height: 200px;
