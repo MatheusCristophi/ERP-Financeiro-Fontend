@@ -1,93 +1,33 @@
 <script lang="ts" setup>
 import Header from '../components/Header.vue';
 import Sidebar from '../components/Sidebar.vue';
-import EmpresaDiv from '../components/EmpresaDiv.vue';
 import DashboardDiv from '../components/DashboardDiv.vue';
+import EmpresaDiv from '../components/EmpresaDiv.vue';
+import ContaDiv from '../components/ContaDiv.vue';
+import LancamentoDiv from '../components/LancamentoDiv.vue';
 import { ref } from 'vue';
 
 const telaAtual = ref('Dashboard');
 
-function atualizarTela(novaTela:string) {
-    telaAtual.value = novaTela
+function atualizarTela(novaTela: string) {
+    telaAtual.value = novaTela;
 }
-
 </script>
 
 <template>
-    <div class="app-layout" v-if="telaAtual === 'Dashboard'">
+    <div class="app-layout">
         <Sidebar @tela-trocada="atualizarTela" class="app-sidebar" />
         <div class="main-container">
             <Header class="app-header" />
-            <main>
-                <DashboardDiv />
+            <main class="app-content">
+                <DashboardDiv v-if="telaAtual === 'Dashboard'" />
+                <EmpresaDiv v-else-if="telaAtual === 'Empresa'" />
+                <ContaDiv v-else-if="telaAtual === 'Conta'" />
+                <LancamentoDiv v-else-if="telaAtual === 'Lancamento'" />
+                <PessoaDiv v-else-if="telaAtual === 'Pessoa'" />
+                <CategoriaDiv v-else-if="telaAtual === 'Categoria'" />
             </main>
         </div>
-
-    </div>
-    <div class="app-layout" v-if="telaAtual === 'Empresa'">
-        <Sidebar @tela-trocada="atualizarTela" class="app-sidebar" />
-        <div class="main-container">
-            <Header class="app-header" />
-            <main>
-                <EmpresaDiv />
-            </main>
-        </div>
-
-    </div>
-    <div class="app-layout" v-if="telaAtual === 'Conta'">
-        <Sidebar @tela-trocada="atualizarTela" class="app-sidebar" />
-        <div class="main-container">
-            <Header class="app-header" />
-
-            <main>
-                <DashboardDiv />
-            </main>
-        </div>
-
-    </div>
-    <div class="app-layout" v-if="telaAtual === 'Lancamento'">
-        <Sidebar @tela-trocada="atualizarTela" class="app-sidebar" />
-        <div class="main-container">
-            <Header class="app-header" />
-
-            <main>
-                <DashboardDiv />
-            </main>
-        </div>
-
-    </div>
-    <div class="app-layout" v-if="telaAtual === 'Pessoa'">
-        <Sidebar @tela-trocada="atualizarTela" class="app-sidebar" />
-        <div class="main-container">
-            <Header class="app-header" />
-
-            <main>
-                <DashboardDiv />
-            </main>
-        </div>
-
-    </div>
-    <div class="app-layout" v-if="telaAtual === 'Categoria'">
-        <Sidebar @tela-trocada="atualizarTela" class="app-sidebar" />
-        <div class="main-container">
-            <Header class="app-header" />
-
-            <main>
-                <DashboardDiv />
-            </main>
-        </div>
-
-    </div>
-    <div class="app-layout" v-if="telaAtual === 'Configuracao'">
-        <Sidebar @tela-trocada="atualizarTela" class="app-sidebar" />
-        <div class="main-container">
-            <Header class="app-header" />
-
-            <main>
-                <DashboardDiv />
-            </main>
-        </div>
-
     </div>
 </template>
 
@@ -97,6 +37,7 @@ function atualizarTela(novaTela:string) {
     height: 100vh;
     width: 100vw;
     max-width: 100vw;
+    overflow: hidden;
 }
 
 .app-sidebar {
@@ -109,16 +50,21 @@ function atualizarTela(novaTela:string) {
 }
 
 .main-container {
-  display: flex;
-  flex-direction: column;
-  flex: 1 1 auto;
-  min-width: 0;
-  height: 100%;
+    display: flex;
+    flex-direction: column;
+    flex: 1 1 auto;
+    min-width: 0;
+    height: 100%;
+    overflow: hidden;
 }
 
 .app-header {
-  width: 100%;
-  flex-shrink: 0;
+    width: 100%;
+    flex-shrink: 0;
 }
 
+.app-content {
+    flex: 1;
+    overflow-y: auto;
+}
 </style>

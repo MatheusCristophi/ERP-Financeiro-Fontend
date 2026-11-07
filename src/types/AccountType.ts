@@ -5,6 +5,7 @@ export type AccountType = {
   movimentacaoTipo: movimentacaoType;
   numero: string;
   agencia: string;
+  status: boolean;
 };
 
 export type contaType = 'CORRENTE' | 'POUPANCA' | 'CAIXA' | 'INVESTIMENTO';

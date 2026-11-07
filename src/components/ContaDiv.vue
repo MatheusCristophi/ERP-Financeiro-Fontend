@@ -14,7 +14,8 @@ const estadoInicialForm: AccountType = {
     contaTipo: 'CORRENTE',
     movimentacaoTipo: 'ENTRADA',
     numero: '',
-    agencia: ''
+    agencia: '',
+    status: true
 };
 
 const contaForm = ref<AccountType>({ ...estadoInicialForm });
@@ -133,6 +134,11 @@ onMounted(() => {
                         <span>Número da Conta</span>
                         <input v-model="contaForm.numero" type="text" placeholder="12345-6" maxlength="13" />
                     </label>
+
+                    <label>
+                        <span>Status da Conta</span>
+                        <input v-model="contaForm.status" type="checkbox" />
+                    </label>
                 </div>
 
                 <div class="form-actions">
@@ -153,6 +159,7 @@ onMounted(() => {
                         <p>Tipo de Movimentação: {{ conta.movimentacaoTipo }}</p>
                         <p>Número da Conta: {{ conta.numero }}</p>
                         <p>Agência: {{ conta.agencia }}</p>
+                        <p>Status: {{ conta.status ? 'Ativa' : 'Inativa' }}</p>
                     </div>
                 </div>
             </div>

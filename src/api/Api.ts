@@ -1,7 +1,17 @@
 import type { AccountType } from "../types/AccountType";
 import type { AuthType } from "../types/AuthType";
+import type { LancamentoType } from "../types/LancamentoType";
 
 const baseUrl = import.meta.env.VITE_API_URL;
+
+function getCookie(name:string) {
+  const value = `; ${document.cookie}`;
+  const parts:string[] = value.split(`; ${name}=`);
+  if (parts.length === 2) {
+    return parts.pop()?.split(';').shift();
+    }
+  return null;
+}
 
 // ==========================================
 // Autenticação do usuário
@@ -11,7 +21,10 @@ export async function login(authBody: AuthType) {
     const response = await fetch(baseUrl + 'auth', {
         method: 'POST',
         credentials: 'include',
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 
+            'Content-Type': 'application/json',
+            'X-XSRF-TOKEN': getCookie('XSRF-TOKEN') || ''
+        },
         body: JSON.stringify({
             cnpj: authBody.cnpj,
             email: authBody.email,
@@ -28,7 +41,10 @@ export async function buscarSessao() {
     const response = await fetch(baseUrl + 'auth/me', {
         method: 'GET',
         credentials: 'include',
-        headers: { 'Content-Type': 'application/json' }
+        headers: { 
+            'Content-Type': 'application/json',
+            'X-XSRF-TOKEN': getCookie('XSRF-TOKEN') || ''
+        }
     })
 
     if (!response.ok) {
@@ -47,7 +63,11 @@ export async function buscarSessao() {
 export async function logout() {
     const response = await fetch(baseUrl + 'auth/logout', {
         method: 'POST',
-        credentials: 'include'    
+        credentials: 'include',
+        headers: { 
+            'Content-Type': 'application/json',
+            'X-XSRF-TOKEN': getCookie('XSRF-TOKEN') || ''
+        }
     })
 
     if (!response.ok) {
@@ -68,7 +88,10 @@ export async function criarEmpresa(empresaBody: any): Promise<any> {
     const response = await fetch(baseUrl + 'empresas', {
         method: 'POST',
         credentials: 'include',
-        headers: { 'Content-Type': 'application/json'},
+        headers: { 
+            'Content-Type': 'application/json',
+            'X-XSRF-TOKEN': getCookie('XSRF-TOKEN') || ''
+        },
         body: JSON.stringify({
             descricao: empresaBody.descricao,
             cnpj: empresaBody.cnpj,
@@ -91,7 +114,10 @@ export async function buscarEmpresaAtual(): Promise<any> {
     const response = await fetch(baseUrl + 'empresas/' + empresaId, {
         method: 'GET',
         credentials: 'include',
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 
+            'Content-Type': 'application/json',
+            'X-XSRF-TOKEN': getCookie('XSRF-TOKEN') || ''
+        },
     })
 
     if(!response.ok) {
@@ -103,12 +129,13 @@ export async function buscarEmpresaAtual(): Promise<any> {
 }
 
 export async function atualizarEmpresa(empresaBody: any): Promise<any> {
-    const empresaId = localStorage.getItem('empresaId');
-
     const response = await fetch(baseUrl + 'empresas', {
         method: 'PUT',
         credentials: 'include',
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 
+            'Content-Type': 'application/json',
+            'X-XSRF-TOKEN': getCookie('XSRF-TOKEN') || ''
+        },
         body: JSON.stringify({
             descricao: empresaBody.descricao,
             cnpj: empresaBody.cnpj,
@@ -133,7 +160,10 @@ export async function buscarContas(): Promise<any> {
     const response = await fetch(baseUrl + 'contas', {
         method: 'GET',
         credentials: 'include',
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 
+            'Content-Type': 'application/json',
+            'X-XSRF-TOKEN': getCookie('XSRF-TOKEN') || ''
+        },
     });
 
     if(!response.ok) {
@@ -148,7 +178,10 @@ export async function buscarContaPorId(id: string): Promise<any> {
     const response = await fetch(baseUrl + 'contas/' + id, {
         method: 'GET',
         credentials: 'include',
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 
+            'Content-Type': 'application/json',
+            'X-XSRF-TOKEN': getCookie('XSRF-TOKEN') || ''
+        },
     });
 
     if(!response.ok) {
@@ -163,7 +196,10 @@ export async function criarConta(contaBody: AccountType): Promise<any> {
     const response = await fetch(baseUrl + 'contas', {
         method: 'POST',
         credentials: 'include',
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 
+            'Content-Type': 'application/json',
+            'X-XSRF-TOKEN': getCookie('XSRF-TOKEN') || ''
+        },
         body: JSON.stringify({
             descricao: contaBody.descricao,
             contaTipo: contaBody.contaTipo,
@@ -185,7 +221,10 @@ export async function desativarConta(id: string): Promise<any> {
     const response = await fetch(baseUrl + 'contas/' + id, {
         method: 'PATCH',
         credentials: 'include',
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 
+            'Content-Type': 'application/json',
+            'X-XSRF-TOKEN': getCookie('XSRF-TOKEN') || ''
+        },
     });
 
     if (!response.ok) {
@@ -199,29 +238,80 @@ export async function desativarConta(id: string): Promise<any> {
 // Chamadas de Lançamento
 // ==========================================
 
-export async function buscarLancamentos(): Promise<any> {
-    // TODO: Completar chamada para buscar lançamentos manualmente
-    return [];
+export async function buscarLancamentos(pageValue: number, sizeValue: number, orderBy: string): Promise<any> {
+    const params = new URLSearchParams({
+        page: pageValue.toString(),
+        size: sizeValue.toString(),
+        sort: orderBy
+    });
+
+    
+    const response = await fetch(baseUrl + 'lancamentos?' + params.toString(), {
+        method: 'GET',
+        credentials: 'include',
+        headers: { 
+            'Content-Type': 'application/json',
+            'X-XSRF-TOKEN': getCookie('XSRF-TOKEN') || ''
+        },
+    });
+
+    if(!response.ok) {
+        throw new Error("Erro ao buscar lançamentos");
+    }
+    
+    const data = await response.json();
+    return data;
 }
 
-export async function buscarLancamentoPorId(_id: string | number): Promise<any> {
-    // TODO: Completar chamada para buscar lançamento por ID manualmente
-    return null;
+export async function criarLancamento(lancamentoBody: LancamentoType, pessoaId: string): Promise<any> {
+    const queryParams = new URLSearchParams({
+        id: pessoaId
+    });
+    const response = await fetch(baseUrl + 'lancamentos?' + queryParams.toString(), {
+        method: 'POST',
+        credentials: 'include',
+        headers: { 
+            'Content-Type': 'application/json',
+            'X-XSRF-TOKEN': getCookie('XSRF-TOKEN') || ''
+        },
+        body: JSON.stringify({
+            descricao: lancamentoBody.descricao,
+            status: lancamentoBody.status,
+            valor: lancamentoBody.valor,
+            categoria: lancamentoBody.categoria,
+            movimentacaoTipo: lancamentoBody.movimentacaoTipo,
+            dataEmissao: lancamentoBody.dataEmissao,
+            dataVencimento: lancamentoBody.dataVencimento,
+            dataPagamento: lancamentoBody.dataPagamento,
+            observacao: lancamentoBody.observacao
+        })
+    });
+
+    if (!response.ok) {
+        throw new Error("Erro ao criar lançamento");
+    }
+
+    return await response.json();
 }
 
-export async function criarLancamento(_lancamentoBody: any): Promise<any> {
-    // TODO: Completar chamada para cadastrar lançamento manualmente
-    return null;
-}
+export async function deletarLancamento(id: string): Promise<any> {
+    const queryParams = new URLSearchParams({
+        id: id
+    });
+    const response = await fetch(baseUrl + 'lancamentos?' + queryParams.toString(), {
+        method: 'DELETE',
+        credentials: 'include',
+        headers: { 
+            'Content-Type': 'application/json',
+            'X-XSRF-TOKEN': getCookie('XSRF-TOKEN') || ''
+        },
+    });
 
-export async function atualizarLancamento(_id: string | number, _lancamentoBody: any): Promise<any> {
-    // TODO: Completar chamada para atualizar lançamento manualmente
-    return null;
-}
+    if (!response.ok) {
+        throw new Error("Erro ao deletar lançamento");
+    }
 
-export async function deletarLancamento(_id: string | number): Promise<any> {
-    // TODO: Completar chamada para deletar lançamento manualmente
-    return null;
+    return await response.json();
 }
 
 // ==========================================
