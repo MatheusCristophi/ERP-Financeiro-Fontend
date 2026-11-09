@@ -397,7 +397,7 @@ select {
 .btn-page {
     display: flex;
     justify-content: space-around;
-    margin-top: 30px;
+    margin-top: 20px;
 
     button {
         width: 100px;
